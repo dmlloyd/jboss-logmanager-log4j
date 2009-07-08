@@ -22,12 +22,8 @@
 
 package org.jboss.logmanager.log4j;
 
-import java.util.IdentityHashMap;
-import java.util.Map;
 import org.jboss.logmanager.ExtLogRecord;
-import org.jboss.logmanager.log4j.handlers.Log4jJDKLevel;
 
-import java.util.logging.Level;
 import org.apache.log4j.Category;
 import org.apache.log4j.spi.LocationInfo;
 import org.apache.log4j.spi.LoggingEvent;
@@ -49,40 +45,13 @@ public final class ConvertedLoggingEvent extends LoggingEvent {
         super(rec.getLoggerClassName(),
                 new DummyCategory(rec.getLoggerName()),
                 rec.getMillis(),
-                getPriorityFor(rec.getLevel()),
+                LevelMapping.getPriorityFor(rec.getLevel()),
                 rec.getMessage(),
                 rec.getThreadName(),
                 rec.getThrown() == null ? null : new ThrowableInformation(rec.getThrown()),
                 rec.getNdc(),
                 new LocationInfo(new Throwable(), rec.getLoggerClassName()),
                 null);
-    }
-
-    private static final Map<Level, org.apache.log4j.Level> priorityMap;
-
-    static {
-        final Map<Level, org.apache.log4j.Level> map = new IdentityHashMap<Level, org.apache.log4j.Level>();
-        map.put(Level.SEVERE, Log4jJDKLevel.SEVERE);
-        map.put(Level.WARNING, Log4jJDKLevel.WARNING);
-        map.put(Level.CONFIG, Log4jJDKLevel.CONFIG);
-        map.put(Level.INFO, Log4jJDKLevel.INFO);
-        map.put(Level.FINE, Log4jJDKLevel.FINE);
-        map.put(Level.FINER, Log4jJDKLevel.FINER);
-        map.put(Level.FINEST, Log4jJDKLevel.FINEST);
-
-        map.put(org.jboss.logmanager.Level.FATAL, org.apache.log4j.Level.FATAL);
-        map.put(org.jboss.logmanager.Level.ERROR, org.apache.log4j.Level.ERROR);
-        map.put(org.jboss.logmanager.Level.WARN, org.apache.log4j.Level.WARN);
-        map.put(org.jboss.logmanager.Level.INFO, org.apache.log4j.Level.INFO);
-        map.put(org.jboss.logmanager.Level.DEBUG, org.apache.log4j.Level.DEBUG);
-        map.put(org.jboss.logmanager.Level.TRACE, org.apache.log4j.Level.TRACE);
-
-        priorityMap = map;
-    }
-
-    static org.apache.log4j.Level getPriorityFor(Level level) {
-        final org.apache.log4j.Level p;
-        return (p = priorityMap.get(level)) == null ? org.apache.log4j.Level.DEBUG : p;
     }
 
     private static final class DummyCategory extends Category {
