@@ -24,9 +24,8 @@ package org.jboss.logmanager.log4j.handlers;
 
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 import org.jboss.logmanager.ExtLogRecord;
-import org.jboss.logmanager.LogManager;
+import org.jboss.logmanager.ExtHandler;
 import org.jboss.logmanager.log4j.ConvertedLoggingEvent;
-import org.jboss.logmanager.handlers.ExtHandler;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.spi.LoggingEvent;
@@ -45,6 +44,25 @@ public final class Log4jAppenderHandler extends ExtHandler {
      * @param appender the appender to delegate to
      */
     public Log4jAppenderHandler(final Appender appender) {
+        appenderUpdater.set(this, appender);
+    }
+
+    /**
+     * Get the log4j appender.
+     *
+     * @return the log4j appender
+     */
+    public Appender getAppender() {
+        return appender;
+    }
+
+    /**
+     * Set the Log4j appender.
+     *
+     * @param appender the log4j appender
+     */
+    public void setAppender(final Appender appender) {
+        checkAccess();
         appenderUpdater.set(this, appender);
     }
 
@@ -74,7 +92,7 @@ public final class Log4jAppenderHandler extends ExtHandler {
      * @throws SecurityException if you are not allowed to close a handler
      */
     public void close() throws SecurityException {
-        LogManager.getLogManager().checkAccess();
+        checkAccess();
         final Appender appender = appenderUpdater.getAndSet(this, null);
         if (appender != null) {
             appender.close();
