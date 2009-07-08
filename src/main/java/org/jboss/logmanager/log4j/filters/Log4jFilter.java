@@ -23,7 +23,7 @@
 package org.jboss.logmanager.log4j.filters;
 
 import org.jboss.logmanager.ExtLogRecord;
-import org.jboss.logmanager.handlers.log4j.ConvertedLoggingEvent;
+import org.jboss.logmanager.log4j.ConvertedLoggingEvent;
 
 import java.util.logging.LogRecord;
 import org.apache.log4j.spi.Filter;
