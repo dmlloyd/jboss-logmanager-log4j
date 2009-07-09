@@ -71,13 +71,14 @@ public final class Log4jAppenderHandler extends ExtHandler {
      *
      * @param record the log record to publish
      */
-    public void publish(final ExtLogRecord record) {
+    protected void doPublish(final ExtLogRecord record) {
         final Appender appender = this.appender;
         if (appender == null) {
             throw new IllegalStateException("Appender is closed");
         }
         final LoggingEvent event = new ConvertedLoggingEvent(record);
         appender.doAppend(event);
+        super.doPublish(record);
     }
 
     /**
