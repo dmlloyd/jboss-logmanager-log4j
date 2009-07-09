@@ -36,7 +36,7 @@ import org.apache.log4j.Appender;
 import org.jboss.logmanager.LogContext;
 
 public final class BridgeRepository implements LoggerRepository {
-    private final Object reposKey = new Object();
+    private final org.jboss.logmanager.Logger.AttachmentKey<BridgeLogger> reposKey = new org.jboss.logmanager.Logger.AttachmentKey<BridgeLogger>();
 
     public void addHierarchyEventListener(final HierarchyEventListener listener) {
         // ignore
@@ -64,7 +64,7 @@ public final class BridgeRepository implements LoggerRepository {
 
     public Logger getLogger(final String name) {
         final org.jboss.logmanager.Logger lmLogger = LogContext.getLogContext().getLogger(name);
-        final Logger logger = (Logger) lmLogger.getAttachment(reposKey);
+        final Logger logger = lmLogger.getAttachment(reposKey);
         if (logger != null) {
             return logger;
         }
@@ -89,7 +89,7 @@ public final class BridgeRepository implements LoggerRepository {
 
     private Logger create(final org.jboss.logmanager.Logger lmLogger) {
         final BridgeLogger logger = new BridgeLogger(lmLogger);
-        final BridgeLogger appearingLogger = (BridgeLogger) lmLogger.attachIfAbsent(reposKey, logger);
+        final BridgeLogger appearingLogger = lmLogger.attachIfAbsent(reposKey, logger);
         return appearingLogger != null ? appearingLogger : logger;
     }
 
