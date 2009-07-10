@@ -35,6 +35,9 @@ import org.apache.log4j.Appender;
 
 import org.jboss.logmanager.LogContext;
 
+/**
+ * A logger repository which returns log4j loggers which bridge to their corresponding LogManager logger.
+ */
 public final class BridgeRepository implements LoggerRepository {
     private final org.jboss.logmanager.Logger.AttachmentKey<BridgeLogger> reposKey = new org.jboss.logmanager.Logger.AttachmentKey<BridgeLogger>();
 

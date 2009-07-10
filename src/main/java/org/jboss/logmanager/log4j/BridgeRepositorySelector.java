@@ -22,13 +22,24 @@
 
 package org.jboss.logmanager.log4j;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+
 import org.apache.log4j.spi.RepositorySelector;
 import org.apache.log4j.spi.LoggerRepository;
 import org.apache.log4j.LogManager;
 
+import org.jboss.logmanager.Logger;
+import org.jboss.logmanager.Level;
+
+/**
+ * A simple repository selector which chooses the {@link BridgeRepository} always.  Contains a {@code start()} method to
+ * facilitate container deployment.
+ */
 public final class BridgeRepositorySelector implements RepositorySelector {
 
     private static final Object guard = new Object();
+    private static final Logger log = Logger.getLogger(BridgeRepositorySelector.class.getName());
 
     private final BridgeRepository bridgeRepository = new BridgeRepository();
 
@@ -36,7 +47,23 @@ public final class BridgeRepositorySelector implements RepositorySelector {
         return bridgeRepository;
     }
 
+    /**
+     * Container install method.  Performs two steps: installs this repository selector into the log4j logmanager, and
+     * clears the system property which prevents log4j from initializing (thus allowing other log4j instances to be
+     * started and configured independently).
+     */
     public void start() {
         LogManager.setRepositorySelector(this, guard);
+        AccessController.doPrivileged(new PrivilegedAction<Void>() {
+            public Void run() {
+                try {
+                    System.clearProperty("log4j.defaultInitOverride");
+                } catch (SecurityException ex) {
+                    log.log(Level.WARN, "Unable to clear system property 'log4j.defaultInitOverride': " +
+                            ex.getMessage() + " (nested log4j deployments may not function as expected");
+                }
+                return null;
+            }
+        });
     }
 }

@@ -34,6 +34,9 @@ import java.util.Enumeration;
 import java.util.ResourceBundle;
 import java.util.Collections;
 
+/**
+ * A log4j logger which bridges to a LogManager logger.
+ */
 public final class BridgeLogger extends org.apache.log4j.Logger {
 
     private static final String FQCN = BridgeLogger.class.getName();
