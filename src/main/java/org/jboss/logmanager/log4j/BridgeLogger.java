@@ -154,18 +154,19 @@ public final class BridgeLogger extends org.apache.log4j.Logger {
     }
 
     public void l7dlog(final Priority priority, final String key, final Throwable t) {
-        logger.log(FQCN, LevelMapping.getLevelFor(level), key, t);
+        logger.log(FQCN, LevelMapping.getLevelFor(priority), key, t);
     }
 
     public void l7dlog(final Priority priority, final String key, final Object[] params, final Throwable t) {
-        logger.log(FQCN, LevelMapping.getLevelFor(level), key, ExtLogRecord.FormatStyle.MESSAGE_FORMAT, params, t);
+        logger.log(FQCN, LevelMapping.getLevelFor(priority), key, ExtLogRecord.FormatStyle.MESSAGE_FORMAT, params, t);
     }
 
     public void log(final Priority priority, final Object message, final Throwable t) {
-        logger.log(FQCN, LevelMapping.getLevelFor(level), String.valueOf(message), t);
+        logger.log(FQCN, LevelMapping.getLevelFor(priority), String.valueOf(message), t);
     }
 
     public void log(final Priority priority, final Object message) {
+        logger.log(FQCN, LevelMapping.getLevelFor(priority), String.valueOf(message), null);
     }
 
     public void log(final String callerFQCN, final Priority level, final Object message, final Throwable t) {
