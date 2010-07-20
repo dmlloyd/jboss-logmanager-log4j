@@ -30,7 +30,7 @@
     <groupId>org.jboss.logmanager</groupId>
     <artifactId>jboss-logmanager-log4j</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.0.CR3-SNAPSHOT</version>
+    <version>1.0.0.CR3</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
