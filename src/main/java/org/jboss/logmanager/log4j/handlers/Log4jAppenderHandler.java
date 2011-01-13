@@ -27,6 +27,7 @@ import org.jboss.logmanager.ExtLogRecord;
 import org.jboss.logmanager.ExtHandler;
 import org.jboss.logmanager.log4j.ConvertedLoggingEvent;
 
+import java.util.logging.Formatter;
 import org.apache.log4j.Appender;
 import org.apache.log4j.spi.LoggingEvent;
 
@@ -35,6 +36,7 @@ import org.apache.log4j.spi.LoggingEvent;
  */
 public final class Log4jAppenderHandler extends ExtHandler {
     private volatile Appender appender = null;
+    private final boolean applyLayout;
 
     private static final AtomicReferenceFieldUpdater<Log4jAppenderHandler, Appender> appenderUpdater = AtomicReferenceFieldUpdater.newUpdater(Log4jAppenderHandler.class, Appender.class, "appender");
 
@@ -44,7 +46,21 @@ public final class Log4jAppenderHandler extends ExtHandler {
      * @param appender the appender to delegate to
      */
     public Log4jAppenderHandler(final Appender appender) {
+        this(appender, false);
+    }
+
+    /**
+     * Construct a new instance, possibly applying a {@code Layout} to the given appender instance.
+     *
+     * @param appender the appender to delegate to
+     * @param applyLayout {@code true} to apply an emulated layout, {@code false} otherwise
+     */
+    public Log4jAppenderHandler(final Appender appender, final boolean applyLayout) {
         appenderUpdater.set(this, appender);
+        this.applyLayout = applyLayout;
+        if (applyLayout) {
+            appender.setLayout(null);
+        }
     }
 
     /**
@@ -64,6 +80,21 @@ public final class Log4jAppenderHandler extends ExtHandler {
     public void setAppender(final Appender appender) {
         checkAccess();
         appenderUpdater.set(this, appender);
+        if (applyLayout && appender != null) {
+            final Formatter formatter = getFormatter();
+            appender.setLayout(formatter == null ? null : new FormatterLayout(formatter));
+        }
+    }
+
+    /** {@inheritDoc} */
+    public void setFormatter(final Formatter newFormatter) throws SecurityException {
+        if (applyLayout) {
+            final Appender appender = this.appender;
+            if (appender != null) {
+                appender.setLayout(new FormatterLayout(newFormatter));
+            }
+        }
+        super.setFormatter(newFormatter);
     }
 
     /**

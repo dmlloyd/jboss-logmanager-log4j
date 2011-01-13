@@ -22,6 +22,7 @@
 
 package org.jboss.logmanager.log4j;
 
+import java.util.Collections;
 import org.jboss.logmanager.ExtLogRecord;
 
 import org.apache.log4j.Category;
@@ -51,13 +52,40 @@ public final class ConvertedLoggingEvent extends LoggingEvent {
                 rec.getThrown() == null ? null : new ThrowableInformation(rec.getThrown()),
                 rec.getNdc(),
                 new LocationInfo(new Throwable(), rec.getLoggerClassName()),
-                null);
+                Collections.singletonMap("org.jboss.logmanager.record", rec));
     }
 
     private static final class DummyCategory extends Category {
-
         protected DummyCategory(String name) {
             super(name);
         }
+    }
+
+    /**
+     * Get a log record for a log4j event.  If the event wraps a log record, that record is returned; otherwise
+     * a new record is built up from the event.
+     *
+     * @param event the event
+     * @return the log record
+     */
+    public static ExtLogRecord getLogRecordFor(LoggingEvent event) {
+        final ExtLogRecord rec = (ExtLogRecord)event.getProperties().get("org.jboss.logmanager.record");
+        if (rec != null) {
+            return rec;
+        }
+        final ExtLogRecord newRecord = new ExtLogRecord(LevelMapping.getLevelFor(event.getLevel()), (String) event.getMessage(), event.getFQNOfLoggerClass());
+        newRecord.setLoggerName(event.getLoggerName());
+        newRecord.setMillis(event.getTimeStamp());
+        newRecord.setThreadName(event.getThreadName());
+        newRecord.setThrown(event.getThrowableInformation().getThrowable());
+        newRecord.setNdc(event.getNDC());
+        if (event.locationInformationExists()) {
+            final LocationInfo locationInfo = event.getLocationInformation();
+            newRecord.setSourceClassName(locationInfo.getClassName());
+            newRecord.setSourceFileName(locationInfo.getFileName());
+            newRecord.setSourceLineNumber(Integer.parseInt(locationInfo.getLineNumber()));
+            newRecord.setSourceMethodName(locationInfo.getMethodName());
+        }
+        return newRecord;
     }
 }

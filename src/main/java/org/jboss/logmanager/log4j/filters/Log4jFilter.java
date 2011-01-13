@@ -53,7 +53,7 @@ public final class Log4jFilter implements java.util.logging.Filter {
      * @return {@code true} if it is loggable
      */
     public boolean isLoggable(final LogRecord record) {
-        final ExtLogRecord extRec = (record instanceof ExtLogRecord) ? (ExtLogRecord)record : new ExtLogRecord(record, java.util.logging.Logger.class.getName());
+        final ExtLogRecord extRec = ExtLogRecord.wrap(record);
         Filter filter = filterChain;
         while (filter != null) {
             final int result = filter.decide(new ConvertedLoggingEvent(extRec));
